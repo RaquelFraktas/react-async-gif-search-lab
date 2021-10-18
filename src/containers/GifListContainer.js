@@ -2,40 +2,34 @@ import React, { Component } from 'react'
 import GifList from '../components/GifList'
 import GifSearch from '../components/GifSearch'
 
-export default class GifListContainer extends Component{
-  
+class GifListContainer extends Component {
+
   state = {
-   gifs: [], 
-//    query: ""
+    gifs: []
   }
 
-  componentDidMount(){  
-
+  render() {
+    return(
+      <div>
+        <GifSearch fetchGIFs={this.fetchGIFs} />
+        <GifList gifs={this.state.gifs} />
+      </div>
+    )
   }
 
-  handleSubmit= (query) =>{
-    this.fetchGifs(query)
+  fetchGIFs = (query = "dolphins") => {
+    fetch(`https://api.giphy.com/v1/gifs/search?q=${query}&api_key=dc6zaTOxFJmzC&rating=g&limit=3`)
+      .then(res => res.json())
+      .then(({data}) => {
+        this.setState({ gifs: data.map( gif => ({ url: gif.images.original.url }) ) })
+      })
   }
 
-  fetchGifs= (query) => {
-    fetch(`https://api.giphy.com/v1/gifs/search?q=${query}&api_key=fSZkMKFxXTnm5MFWDk5chpCOOWZ7YZaX&rating=g`)
-    .then((response) => response.json())
-    .then(response => {
-      response.data.map(resp => this.setState({gifs: {resp}}))
-    }) //set states etc
-  }
-  
-  render(){
-      //render gifsearch and giflist in here. call this.fetchgifs in componentdid mount. pass state in those components 
-      return( <div>
-            {this.fetchGifs()}
-            <GifList gif1={this.state.gifs[0]}/>
-            <GifList gif2={this.state.gifs[1]}/>
-            <GifList gif3={this.state.gifs[2]}/>
-            <GifSearch query= {this.handlesubmit}/>
-          </div>
-        )
-      
+  componentDidMount() {
+    this.fetchGIFs()
   }
 
+  // so does the component did mount part just call fetches?
 }
+
+export default GifListContainer
